@@ -35,18 +35,6 @@ Model 返回 `tool_calls` 只代表“提出行动”，不代表工具已经执
 7. 检查结果、处理失败、限制循环次数；
 8. 决定何时结束或转交人工。
 
-对象控制关系是：
-
-```text
-开发者
-  └── 创建 Harness
-        ├── 持有 Model 客户端
-        ├── 持有 messages / trajectory
-        ├── 持有工具描述与工具实现映射
-        ├── 调用 Model
-        ├── 校验并执行工具
-        └── 读取 Environment 返回的 observation
-```
 
 > Harness 可以创建沙盒、重置沙盒或限制沙盒权限，但沙盒中实际变化的文件和进程属于 Environment。
 
