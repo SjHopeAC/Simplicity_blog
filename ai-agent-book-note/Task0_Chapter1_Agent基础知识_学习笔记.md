@@ -4,13 +4,10 @@
 
 ### （一）Environment 是什么
 
-我把 Environment 理解为 Agent 之外、能够被观察或改变的世界，例如：
+把 Environment 理解为 Agent 之外、能够被观察或改变的世界，例如：
 
 - 文件系统中的文件和进程；
 - 浏览器中的网页和表单；
-- 数据库里的业务状态；
-- 搜索服务、邮件服务和支付系统；
-- 用户以及其他 Agent。
 
 Environment 即使与 Agent 运行在同一台电脑、同一进程，也仍然是环境。判断边界的标准不是物理部署位置，而是谁决定状态如何变化：Harness 负责发出动作，环境负责产生真实结果。
 
@@ -27,7 +24,7 @@ Model 返回 `tool_calls` 只代表“提出行动”，不代表工具已经执
 
 ### （三）Harness 是什么
 
-我把 Harness 理解为 Agent 边界内、模型之外的运行与治理层。它主要负责：
+把 Harness 理解为 Agent 边界内、模型之外的运行与治理层。它主要负责：
 
 1. 创建和维护消息历史；
 2. 向模型暴露工具定义；
@@ -188,30 +185,6 @@ raise RuntimeError("超过最大迭代次数")
 - `validate()`、`execute_tool()` 是 Harness 设计；
 - `execute_tool()` 内部才会访问 Environment。
 
-### （三）完整控制链与返回点
-
-```text
-用户向 main.py 提交任务
-  ↓
-main.py 创建 Agent/Harness 对象
-  ↓
-Harness 组合系统提示词、工具定义和轨迹
-  ↓
-Harness 调用 Model
-  ↓
-Model 返回 tool_calls，控制权回到 Harness
-  ↓
-Harness 校验并执行工具，Environment 返回 observation
-  ↓
-Harness 把 observation 追加为 tool 消息
-  ↓
-控制权回到循环顶部，再次调用 Model
-  ↓
-Model 返回无 tool_calls 的最终文本
-  ↓
-控制权回到 Harness，Harness 输出结果并结束
-```
-
 ## 五、Harness 五要素
 
 ### （一）Context：上下文管理
@@ -234,33 +207,11 @@ Model 返回无 tool_calls 的最终文本
 
 验证失败后重试、换策略、回滚、熔断或转交人工。纠正不是无限重试；需要最大次数、错误分类和稳定退出路径。
 
-完整生产循环为：
-
-```text
-Environment 提供观察
-  ↓
-Harness 构造上下文
-  ↓
-Model 提议行动
-  ↓
-Harness 约束并校验行动
-  ↓
-Environment 执行并返回结果
-  ↓
-Harness 验证结果
-  ├── 正确：进入下一轮或结束
-  └── 错误：纠正、回滚、重试或人工接管
-```
-
 ## 六、工作流与自主 Agent
 
 ### （一）工作流
 
-工作流的路径由程序预先规定，适合规则明确、顺序稳定、需要可预测性的任务：
-
-```text
-输入 → 分类 → 提取 → 生成 → 验证 → 输出
-```
+工作流的路径由程序预先规定，适合规则明确、顺序稳定、需要可预测性的任务
 
 实验 1-4 的“改写 → 生图”就是工作流。模型参与节点内容生成，但不能改变整个图的执行顺序。
 
